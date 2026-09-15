@@ -15,11 +15,11 @@
 
 | | |
 |---|---|
-| **进行到** | Week 1 · **Day 1**（线性代数 / shape 推导） |
-| **已完成** | 理论 ✅ · 31 题 Coding ✅ · 错题 Debug ✅ |
-| **未完成** | `tensor_shape_notes.md` 的 **§7 速查表（20 行）**、**§8 易错点**、**§9 复盘三行**、打卡 |
-| **下次第一步** | 填完 `tensor_shape_notes.md` §7/§8/§9 → 找 Claude 批改 |
-| **再下一步** | Day 2：微积分 + 链式法则（手推 `y=(wx+b)²` 的导数） |
+| **进行到** | Week 1 · **Day 2**（微积分 / 链式法则） |
+| **Day 1** | ✅ **完成**（2026-09-15） |
+| **Day 1 成绩** | quiz 25/31 → 速查表 19/20 |
+| **下次第一步** | 手推 `y = (wx+b)²` 对 `w`、`b`、`x` 的导数 |
+| **产出** | Week 1 进度表里 Day 1 已勾选 |
 
 **Day 1 用到的文件**（都在 `week01/day01_shapes/`）：
 
@@ -83,7 +83,7 @@ deep-learning-journey/
 
 预计投入 15–17 h
 
-- [ ] **Day 1** 线性代数：shape 推导 + broadcasting
+- [x] **Day 1** 线性代数：shape 推导 + broadcasting ✅
       → `shape_drills.py`（31 题，填 guess 版）
       → `shape_quiz.py`（31 题，终端交互答题版）
       → `numpy_semantics.md`（NumPy 语义速览）

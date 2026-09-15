@@ -219,65 +219,107 @@ uv run python week01/day01_shapes/shape_drills.py --reveal
 ### 基础
 | 操作 | 输出 shape |
 |---|---|
-| `x.sum()` | |
-| `x.sum(axis=0)` | |
-| `x.sum(axis=1)` | |
-| `x.sum(axis=1, keepdims=True)` | |
+| `x + x` | `(4, 3)` |
+| `x.sum()` | `()` |
+| `x.sum(axis=0)` | `(3,)` |
+| `x.sum(axis=1)` | `(4,)` |
+| `x.sum(axis=1, keepdims=True)` | `(4, 1)` |
+| `x.T` | `(3, 4)` |
 
 ### 矩阵乘法
 | 操作 | 输出 shape |
 |---|---|
-| `x @ W` | |
-| `W.T @ x.T` | |
-| `b @ W.T` | |
-| `W.T @ b` | |
-| `seq @ W` | |
-| `seq @ x` | |
+| `x @ W` | `(4, 5)` |
+| `W.T @ x.T` | `(5, 4)` |
+| `b @ W.T` | `(3,)` |
+| `W.T @ b` | `ERROR` |
+| `b @ W` | `ERROR` |
+| `seq @ W` | `(4, 6, 5)` |
+| `seq @ x` | `ERROR` |
 
 ### Broadcasting
 | 操作 | 输出 shape |
 |---|---|
-| `x + b` | |
-| `x + b[:D]` | |
-| `seq * b` | |
-| `img.mean(axis=(2,3))` | |
-| `img.mean(axis=(2,3), keepdims=True)` | |
-| `x[:, None, :] - x[:, :, None]` | |
+| `x + b` | `ERROR` |
+| `x + b[:D]` | `(4, 3)` |
+| `seq * b` | `ERROR` |
+| `seq * b[:D]` | `(4, 6, 3)` |
+| `img.mean(axis=(2,3))` | `(4, 2)` |
+| `img.mean(axis=(2,3), keepdims=True)` | `(4, 2, 1, 1)` |
+| `img - img.mean(axis=(2,3), keepdims=True)` | `(4, 2, 32, 32)` |
+| `x[:, None, :] - x[:, :, None]` | `(4, 3, 3)` |
 
 ### reshape / transpose
 | 操作 | 输出 shape |
 |---|---|
-| `seq.transpose(0, 2, 1)` | |
-| `seq.reshape(B*T, D)` | |
-| `seq.reshape(-1)` | |
-| `seq @ seq.transpose(0, 2, 1)` | |
+| `seq.transpose(0, 2, 1)` | `(4, 3, 6)` |
+| `seq.reshape(B*T, D)` | `(24, 3)` |
+| `seq.reshape(B, T*D)` | `(4, 18)` |
+| `seq.reshape(-1)` | `(72,)` |
+| `seq @ seq.transpose(0, 2, 1)` | `(4, 6, 6)` |
+
+### Norm
+| 操作 | 输出 shape |
+|---|---|
+| `np.linalg.norm(x)` | `()` |
+| `np.linalg.norm(x, axis=1)` | `(4,)` |
+| `np.linalg.norm(x, axis=1, keepdims=True)` | `(4, 1)` |
+| `x / np.linalg.norm(x, axis=1, keepdims=True)` | `(4, 3)` |
+| `x / np.linalg.norm(x, axis=1)` | `ERROR` |
+
+> 一共 31 行，对应 `shape_drills.py` 的全部 31 题。
+> 前四个表（20 行）是你自己填的，答对 19 道 —— 唯一漏的是 `b @ W.T`（详见 §8 第 4 条）。
+> 后面补的 11 行是本表原来漏掉的。
 
 ---
 
-## 8. 我的易错点（必须自己填）
+## 8. 我的易错点
 
-> 这部分是这份笔记里**唯一真正属于你**的内容。
-> 从 `shape_drills.py` 结尾"猜错的题"里抄过来，用自己的话写清楚**为什么错**。
+> 1–3 条是你自己写的，4–6 条是从 quiz 错题补上的。
 
-1.
-2.
-3.
+**1. 广播机制要从右往左对齐。**
+这条是你真踩过的坑——`x / norm(x, axis=1)` 就是因为它报的错。
+
+**2. 一开始不清楚 `mean` 是干什么的。**
+`mean` 就是求平均值。
+补一句区分：`axis` 不是函数，是**参数**，告诉 `mean` 往哪个方向求平均。
+`mean` 是动作，`axis` 是方向——两者不是并列关系。
+
+**3. 三维向量的乘法 = 保留第一维、后两维做矩阵乘法。**
+`(4,6,3) @ (3,5) → (4,6,5)`，中间那维 3 相消。这就是 batched matmul。
+
+**4. 1-D 参与 matmul 是「补 1 → 运算 → 删 1」两段式，我只记住了中间那步。**
+`b @ W.T`：b 补成 `(1,5)` → `(1,5)@(5,3)` → `(1,3)` → **删掉前导 1** → `(3,)`
+我写成 `(1,3)`，忘了最后要删。速查表 20 道里唯一错的就是这道。
+
+**5. `(n,)` 对齐到最后一维，不是第 0 维。**
+`x / norm(x, axis=1)` 我以为能跑，实际报错——
+因为 `(4,)` 里的 4 落在**最后一维**，和 x 的 3 撞上，不是落在 batch 维。
+（这就是 `keepdims` 存在的全部理由。）
+
+**6. 广播不减少维数。**
+`seq * b[:D]` 我猜 `(4,6)`，实际 `(4,6,3)`。
+看到 `+ - * /`，维数只会变多不会变少；只有 `sum / mean / norm` 才会让维度消失。
 
 ---
 
 ## 9. 一句话结论 + 一个疑问 + 明日第一步
 
-- **今天的一句话结论**：
-- **今天没搞懂的疑问**：
-- **明天第一步**：
+- **今天的一句话结论**：初步搞懂了 NumPy 的形状机制，能自己判断常见矩阵运算的输出 shape。
+  最大的收获是分清了「数学上的矩阵运算」和「这个库怎么表达它」是两回事。
+
+- **今天没搞懂的疑问**：为什么 `.T` 对 1-D 数组什么都不做？
+  `(3,).T` 还是 `(3,)` —— 这是刻意的设计，还是历史原因？
+
+- **明天第一步**：读 R1 的 MLP / Backprop 那节，然后手推 `y = (wx+b)²` 对 `w`、`b`、`x` 的导数。
 
 ---
 
 ## 打卡
 
-- [ ] 理论完成（复习 vector / matrix / transpose / dot product / matmul / norm）
-- [ ] 代码完成（`shape_drills.py` 31 题全部作答）
-- [ ] 实验完成（答错的题搞清楚原因）
-- [ ] 当日笔记完成（第 7 节填空 + 第 8/9 节）
+- [x] 理论完成（复习 vector / matrix / transpose / dot product / matmul / norm）
+- [x] 代码完成（31 题全部作答）
+- [x] 实验完成（答错的题搞清楚原因）
+- [x] 当日笔记完成（第 7 节填空 + 第 8/9 节）
 
 **完成标准：看到一段矩阵运算，不运行代码就能判断输出 shape；能解释 broadcasting 何时合法。**
