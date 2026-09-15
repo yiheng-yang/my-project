@@ -8,6 +8,31 @@
 
 ---
 
+## 📍 当前进度快照
+
+> **每次学习结束后更新这里。** 下次开终端 `cat README.md` 一眼就知道从哪继续。
+> 最后更新：2026-09-15
+
+| | |
+|---|---|
+| **进行到** | Week 1 · **Day 1**（线性代数 / shape 推导） |
+| **已完成** | 理论 ✅ · 31 题 Coding ✅ · 错题 Debug ✅ |
+| **未完成** | `tensor_shape_notes.md` 的 **§7 速查表（20 行）**、**§8 易错点**、**§9 复盘三行**、打卡 |
+| **下次第一步** | 填完 `tensor_shape_notes.md` §7/§8/§9 → 找 Claude 批改 |
+| **再下一步** | Day 2：微积分 + 链式法则（手推 `y=(wx+b)²` 的导数） |
+
+**Day 1 用到的文件**（都在 `week01/day01_shapes/`）：
+
+| 文件 | 用途 |
+|---|---|
+| `numpy_semantics.md` | 原理速览（axis / 广播 / 1-D 提升 / reshape / keepdims / norm） |
+| `numpy_demo.py` | 配套可运行演示，边读边跑 |
+| `shape_quiz.py` | **31 题交互答题**（推荐） |
+| `shape_drills.py` | 31 题填 `guess=` 版 / `--reveal` 看答案 |
+| `tensor_shape_notes.md` | 速查表 + 错题本（**待填**） |
+
+---
+
 ## 环境
 
 用 [uv](https://docs.astral.sh/uv/) 管理，Python 3.12 + numpy + matplotlib。
