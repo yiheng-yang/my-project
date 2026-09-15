@@ -58,7 +58,12 @@ deep-learning-journey/
 
 预计投入 15–17 h
 
-- [ ] **Day 1** 线性代数：shape 推导 + broadcasting → `shape_drills.py` + `tensor_shape_notes.md`
+- [ ] **Day 1** 线性代数：shape 推导 + broadcasting
+      → `shape_drills.py`（31 题，填 guess 版）
+      → `shape_quiz.py`（31 题，终端交互答题版）
+      → `numpy_semantics.md`（NumPy 语义速览）
+      → `numpy_demo.py`（配套可运行演示）
+      → `tensor_shape_notes.md`（速查表）
 - [ ] **Day 2** 微积分：偏导 / 梯度 / 链式法则 → `derivative_notes.md`
 - [ ] **Day 3** 概率 / MLE / Entropy / Cross Entropy → `losses.py`
 - [ ] **Day 4** Linear Regression from scratch → `01-linear-regression/` + loss curve
