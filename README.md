@@ -2,8 +2,8 @@
 
 12 周 / 90 天深度学习主线：**数学 → 训练范式 → Backprop → MLP → PyTorch → CNN → Attention → Transformer → GPT → Fine-tuning → LoRA**
 
+> 📋 **完整计划见 [STUDY-PLAN.md](STUDY-PLAN.md)** —— 内容取自 A 计划，节奏与容错机制取自 B 计划（2026-09-15 合并）
 > 执行原则：**理解 → 手推 → 手写 → 实验 → Debug → 总结**
-> 学习比例：~30% 理论 + 60% Coding/实验 + 10% 复盘
 > 完成标准：不是"视频看完"，而是"**能从空文件实现 / 能解释 / 能做实验**"
 
 ---
@@ -19,17 +19,18 @@
 | **Day 1** | ✅ **完成**（2026-09-15） |
 | **Day 1 成绩** | quiz 25/31 → 速查表 19/20 |
 | **下次第一步** | 手推 `y = (wx+b)²` 对 `w`、`b`、`x` 的导数 |
-| **产出** | Week 1 进度表里 Day 1 已勾选 |
+| **计划版本** | 合并版（A 的内容 + B 的节奏），2026-09-15 切换 |
 
-**Day 1 用到的文件**（都在 `week01/day01_shapes/`）：
+**Day 2 的文件**（都在 `week01/day02_calculus/`）：
 
 | 文件 | 用途 |
 |---|---|
-| `numpy_semantics.md` | 原理速览（axis / 广播 / 1-D 提升 / reshape / keepdims / norm） |
-| `numpy_demo.py` | 配套可运行演示，边读边跑 |
-| `shape_quiz.py` | **31 题交互答题**（推荐） |
-| `shape_drills.py` | 31 题填 `guess=` 版 / `--reveal` 看答案 |
-| `tensor_shape_notes.md` | 速查表 + 错题本（**待填**） |
+| `grad_check.py` | 梯度验证器 —— 手推完填进去，用数值梯度对答案 |
+| `derivative_notes.md` | 手推模板 + 三条验收问题 |
+
+**Day 1 的文件**（都在 `week01/day01_shapes/`，已归档）：
+
+`numpy_semantics.md` · `numpy_demo.py` · `shape_quiz.py` · `shape_drills.py` · `tensor_shape_notes.md`
 
 ---
 
@@ -53,26 +54,37 @@ uv run python <script.py>
 
 ```
 deep-learning-journey/
-├── README.md              ← 本文件（进度追踪）
+├── README.md              本文件（进度追踪 + 当前快照）
+├── STUDY-PLAN.md          完整计划（合并版）
 ├── requirements.txt
 ├── .venv/
 └── week01/
-    └── day01_shapes/
-        ├── shape_drills.py         ← 31 道 shape 判断题
-        └── tensor_shape_notes.md   ← Tensor shape 速查表（长期复用）
+    ├── day01_shapes/           ✅ 已完成
+    │   ├── numpy_semantics.md      NumPy 语义速览
+    │   ├── numpy_demo.py           配套可运行演示
+    │   ├── shape_quiz.py           31 题交互答题
+    │   ├── shape_drills.py         31 题填 guess 版
+    │   └── tensor_shape_notes.md   速查表 + 错题本
+    └── day02_calculus/         ← 进行中
+        ├── grad_check.py           梯度验证器
+        └── derivative_notes.md     手推模板
 ```
+
+> 后续每周的新目录按 `STUDY-PLAN.md` 第五节的产出清单建（如 `01-linear-regression/`、`03-micrograd/`）。
 
 ---
 
-## 每日 2.5 小时模板
+## 每日 2 小时模板（45 / 60 / 15）
 
-| 时间 | 任务 |
-|---|---|
-| 0–15 min | 闭卷回忆昨天 + 看昨天 TODO |
-| 15–60 min | 教材 / 视频 / 推导 |
-| 60–125 min | Coding / from scratch 实现 |
-| 125–145 min | 实验 / Debug / shape check |
-| 145–150 min | 当天笔记：**一句结论 + 一个疑问 + 明日第一步** |
+| 时段 | 时长 | 做什么 |
+|---|---|---|
+| **概念** | ~45 min | 读指定章节 / 看指定视频。**边读边用自己的话复述**——不允许只看不写 |
+| **编码** | ~60 min | 动手实现。写「从零实现」的不调库；写「用 PyTorch」的不重复造轮子 |
+| **检验与思考** | ~15 min | 合上资料答当天的思考题。**答不出的标红**，进当周补课清单 |
+
+**每周第 7 天是复盘 + 弹性缓冲日**：有欠账就补，没欠账就默写知识地图 / 抽工具函数 / 整理 repo。
+
+> 三条底线：允许某天只做 30 分钟，**不允许连续两天空缺**；跟不上**顺延不跳过**；**不要跳过手写实现**。
 
 ---
 
