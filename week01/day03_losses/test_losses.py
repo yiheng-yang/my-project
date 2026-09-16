@@ -2,18 +2,22 @@
 Day 3 | losses.py 的测试
 =====================================================================
 跑法：
+    cd ~/Desktop/my-project/deep-learning-journey
     uv run python week01/day03_losses/test_losses.py
 
-一共 7 项测试。全过说明你写对了。
+三组测试，写好一个跑一次：
+    T1-T4   stable_softmax
+    T5-T6   cross_entropy
+    T7      cross_entropy_grad（梯度检验）
 
-测试组：
-    T1-T4   softmax（形状、和为1、平移不变、数值稳定性）
-    T5-T6   cross_entropy（手算验证、与参考一致）
-    T7      梯度检验（用 Day 2 写的数值梯度思路）
+还没实现的那组会友好跳过，不会报错 —— 你可以随时跑来检查进度。
 """
 
 import numpy as np
 import losses as L
+
+OK, BAD = "✓", "✗"
+_results = []
 
 
 # ---------------------------------------------------------------------
@@ -34,10 +38,6 @@ def numerical_grad(f, x, eps=1e-6):
     return g
 
 
-OK, BAD = "✓", "✗"
-_results = []
-
-
 def check(name, cond, detail=""):
     _results.append(bool(cond))
     mark = OK if cond else BAD
@@ -48,30 +48,10 @@ def check(name, cond, detail=""):
 
 
 # =====================================================================
-def main():
-    print("\n" + "=" * 68)
-    print("  Day 3 · losses.py 测试")
-    print("=" * 68)
-
-    # ---- 先检查有没有实现 ----
-    try:
-        L.stable_softmax(np.array([[1.0, 2.0, 3.0]]))
-    except NotImplementedError:
-        print("""
-  stable_softmax 还没实现。
-
-  打开 losses.py，把三个 TODO 填掉再来跑。
-
-  提示顺序：先写 ① stable_softmax，跑一次；再写 ②，再跑；
-            最后写 ③。一次写一个，好定位问题。
-""")
-        return
-
-    rng = np.random.default_rng(0)
-
-    # =================================================================
+# T1-T4 · stable_softmax
+# =====================================================================
+def section_softmax(rng):
     print("\n--- T1-T4 · stable_softmax ---\n")
-
     logits = rng.normal(size=(4, 5))
 
     # T1 形状 + 和为 1
@@ -97,22 +77,25 @@ def main():
               f"logits=[1000,1001,1002] -> {pb.round(6)}")
     except Exception as e:
         check("T3 大数值不溢出", False, f"抛异常了：{e}")
+        pb = None
 
-    # T4 对比朴素实现（展示差别）
-    print("\n        （对照）朴素实现 exp(x)/Σexp(x) 遇到大数值会怎样：")
-    with np.errstate(over="ignore", invalid="ignore"):
-        naive = np.exp(big) / np.exp(big).sum()
-    print(f"        朴素版 -> {naive}   ← inf/nan")
-    print(f"        你的版 -> {pb}   ← 正常")
+    # T4 对照朴素实现
+    if pb is not None:
+        print("\n        （对照）朴素实现 exp(x)/Σexp(x) 遇到大数值会怎样：")
+        with np.errstate(over="ignore", invalid="ignore"):
+            naive = np.exp(big) / np.exp(big).sum()
+        print(f"        朴素版 -> {naive}   ← inf/nan")
+        print(f"        你的版 -> {pb}   ← 正常")
 
-    # =================================================================
+
+# =====================================================================
+# T5-T6 · cross_entropy
+# =====================================================================
+def section_ce(rng):
     print("\n--- T5-T6 · cross_entropy ---\n")
 
-    # T5 手算验证：单个样本，答案应该是 0
-    #     logits = [0, 0, 0] -> softmax = [1/3, 1/3, 1/3]
-    #     正确类别概率 = 1/3 -> CE = -log(1/3) = log(3)
-    lg1 = np.zeros((1, 3))
-    lb1 = np.array([0])
+    # T5 手算验证：logits 全 0 -> softmax = 1/3 -> CE = -log(1/3) = log(3)
+    lg1, lb1 = np.zeros((1, 3)), np.array([0])
     expected = np.log(3)
     got = L.cross_entropy(lg1, lb1)
     check("T5 手算验证：logits 全 0 -> log(3)",
@@ -120,10 +103,8 @@ def main():
           f"期望 {expected:.6f}，得到 {got:.6f}")
 
     # T5b 极准的预测 -> loss 接近 0
-    lg2 = np.array([[10.0, 0.0, 0.0]])
-    got2 = L.cross_entropy(lg2, lb1)
-    check("T5b 预测极准时 loss 接近 0", got2 < 0.001,
-          f"得到 {got2:.3e}")
+    got2 = L.cross_entropy(np.array([[10.0, 0.0, 0.0]]), lb1)
+    check("T5b 预测极准时 loss 接近 0", got2 < 0.001, f"得到 {got2:.3e}")
 
     # T6 与参考一致
     logits_b = rng.normal(size=(8, 5))
@@ -135,50 +116,92 @@ def main():
 
     # T6b 大 logits 也不炸
     try:
-        big_b = np.array([[1000.0, 1001.0], [0.0, 0.0]])
-        labels_c = np.array([0, 1])
-        v = L.cross_entropy(big_b, labels_c)
+        v = L.cross_entropy(np.array([[1000.0, 1001.0], [0.0, 0.0]]), np.array([0, 1]))
         check("T6b 大 logits 下 loss 有限", np.isfinite(v), f"得到 {v:.6f}")
     except Exception as e:
         check("T6b 大 logits 下 loss 有限", False, f"抛异常了：{e}")
 
-    # =================================================================
+
+# =====================================================================
+# T7 · 梯度检验
+# =====================================================================
+def section_grad(rng):
     print("\n--- T7 · 梯度检验（用数值梯度验证你的解析梯度）---\n")
 
-    try:
-        logits_g = rng.normal(size=(4, 3))
-        labels_g = rng.integers(0, 3, size=4)
+    logits_g = rng.normal(size=(4, 3))
+    labels_g = rng.integers(0, 3, size=4)
 
-        num = numerical_grad(lambda x: L.cross_entropy(x, labels_g), logits_g)
-        ana = L.cross_entropy_grad(logits_g, labels_g)
+    num = numerical_grad(lambda x: L.cross_entropy(x, labels_g), logits_g)
+    ana = L.cross_entropy_grad(logits_g, labels_g)
 
-        close = np.allclose(num, ana, rtol=1e-5, atol=1e-7)
-        check("T7 梯度与数值梯度一致", close)
-        print(f"\n        ∂loss/∂logits 形状 = {ana.shape}")
-        print(f"        第 0 个样本的梯度:")
-        print(f"          数值: {num[0].round(6)}")
-        print(f"          你的: {ana[0].round(6)}")
-        print(f"\n        观察这行梯度：{ana[0].round(6)}")
-        print(f"          • 正确答案是类别 {labels_g[0]}，它是这一行里【最负】的那个 "
-              f"（{'✓' if np.argmin(ana[0]) == labels_g[0] else '✗'}）")
-        print(f"          • 其他位置都是正的")
-        print(f"          • 整行加起来 ≈ {ana[0].sum():.3e}（应该接近 0）")
-        print(f"\n        为什么会这样：梯度 = softmax − one_hot")
-        print(f"        正确类别位置上减了 1，所以变负；其他位置原样保留，所以是正。")
-        print(f"        含义：正确类别的分数该【往上推】，其他类别该【往下压】。")
-    except Exception as e:
-        check("T7 梯度与数值梯度一致", False, f"抛异常了：{e}")
+    close = np.allclose(num, ana, rtol=1e-5, atol=1e-7)
+    check("T7 梯度与数值梯度一致", close)
+    if not close:
+        print(f"\n        数值: {num[0].round(6)}")
+        print(f"        你的: {ana[0].round(6)}")
+        return
 
-    # =================================================================
-    n_ok = sum(_results)
-    n_all = len(_results)
+    print(f"\n        ∂loss/∂logits 形状 = {ana.shape}")
+    print(f"        观察这行梯度：{ana[0].round(6)}")
+    print(f"          • 正确答案是类别 {labels_g[0]}，它是这一行里【最负】的那个 "
+          f"（{'✓' if np.argmin(ana[0]) == labels_g[0] else '✗'}）")
+    print(f"          • 其他位置都是正的")
+    print(f"          • 整行加起来 ≈ {ana[0].sum():.3e}（应该接近 0）")
+    print(f"\n        为什么会这样：梯度 = softmax − one_hot")
+    print(f"        正确类别位置上减了 1，所以变负；其他位置原样保留，所以是正。")
+    print(f"        含义：正确类别的分数该【往上推】，其他类别该【往下压】。")
+
+
+# =====================================================================
+def main():
     print("\n" + "=" * 68)
-    print(f"  结果：{n_ok} / {n_all} 通过")
+    print("  Day 3 · losses.py 测试")
     print("=" * 68)
 
-    if n_ok == n_all:
+    rng = np.random.default_rng(0)
+    dummy = np.array([[1.0, 2.0, 3.0]])
+    lb = np.array([0])
+
+    # 每组：标题 / 探针（检查实现了没）/ 正文
+    sections = [
+        ("T1-T4 · stable_softmax",
+         lambda: L.stable_softmax(dummy),
+         lambda: section_softmax(rng)),
+        ("T5-T6 · cross_entropy",
+         lambda: L.cross_entropy(dummy, lb),
+         lambda: section_ce(rng)),
+        ("T7 · 梯度检验",
+         lambda: L.cross_entropy_grad(dummy, lb),
+         lambda: section_grad(rng)),
+    ]
+
+    n_done = 0
+    for title, probe, run in sections:
+        try:
+            probe()
+        except NotImplementedError:
+            print(f"\n--- {title} ---\n")
+            print(f"  ⏳ 还没实现 —— 跳过")
+            print(f"     （填完 losses.py 里对应的 TODO，再跑一次）")
+            continue
+        n_done += 1
+        run()
+
+    # ---------------- 结算 ----------------
+    print("\n" + "=" * 68)
+    if _results:
+        n_ok = sum(_results)
+        print(f"  已跑部分：{n_ok} / {len(_results)} 通过")
+    print(f"  实现进度：{n_done} / 3 个函数")
+    print("=" * 68)
+
+    if n_done < 3:
+        todo = ["stable_softmax", "cross_entropy", "cross_entropy_grad"][n_done:]
+        print(f"\n  还差：{', '.join(todo)}")
+        print(f"  一次写一个，写完就重跑这条命令。\n")
+    elif all(_results):
         print("""
-  全过了。
+  三个函数全部写好，10 项测试全过。
 
   留意 T7 那个结果 —— ∂loss/∂logits = softmax − one_hot，
   简单到不像话，但这是真的。Day 4 训练线性回归和
@@ -186,8 +209,8 @@ def main():
 """)
     else:
         print("""
-  有几项没过。先看是哪一组：
-    T1-T4 没过 -> softmax 的问题。检查有没有减最大值、keepdims 加了吗
+  有测试没过。按组看：
+    T1-T4 没过 -> softmax。检查有没有减最大值、keepdims 加了吗
     T5-T6 没过 -> cross_entropy。检查 logsumexp 的 max-shift 写对没
     T7 没过    -> 梯度。检查是不是忘了除以 N（loss 是平均）
 """)

@@ -47,15 +47,19 @@ import numpy as np
 #       (N, C) 的概率，每行的和必须是 1
 # =====================================================================
 def stable_softmax(logits, axis=-1):
-    logits = np.asarray(logits, dtype=float)
-
+    logits=np.asarray(logits, dtype=float)
+    shifted=logits-np.max(logits,axis=axis,keepdims=True)
     # ↓↓↓ TODO: 实现稳定版 softmax ↓↓↓
-    #
+    exp_values=np.exp(shifted)
+    probs=exp_values / np.sum(exp_values,axis=axis,keepdims=True)
+    return probs
+
+
     # 提示三步：
     #   1. 减去最大值（要用 keepdims=True，想想为什么）
     #   2. 取 exp
     #   3. 除以和（同样要 keepdims=True）
-    #
+
     raise NotImplementedError("还没实现 stable_softmax")
     # ↑↑↑ TODO ↑↑↑
 
