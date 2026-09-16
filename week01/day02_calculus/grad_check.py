@@ -114,9 +114,9 @@ def grad1(p):
     w, b, x = p
 
     # ↓↓↓ TODO: 把下面三行换成你推出来的式子 ↓↓↓
-    dw = 0.0
-    db = 0.0
-    dx = 0.0
+    dw = 2(wx+b)*x
+    db = 2(wx+b)
+    dx = 2(wx+b)*w
     # ↑↑↑ TODO ↑↑↑
 
     return np.array([dw, db, dx])
