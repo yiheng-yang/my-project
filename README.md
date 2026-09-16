@@ -15,22 +15,24 @@
 
 | | |
 |---|---|
-| **进行到** | Week 1 · **Day 2**（微积分 / 链式法则） |
-| **Day 1** | ✅ **完成**（2026-09-15） |
-| **Day 1 成绩** | quiz 25/31 → 速查表 19/20 |
-| **下次第一步** | 手推 `y = (wx+b)²` 对 `w`、`b`、`x` 的导数 |
+| **进行到** | Week 1 · **Day 3**（概率 / MLE / Cross Entropy） |
+| **Day 1** | ✅ 完成（09-15）· quiz 25/31 → 速查表 19/20 |
+| **Day 2** | ✅ 完成（09-16）· 验收 A 组 5/5，三组梯度测试通过 |
+| **下次第一步** | 在 `losses.py` 实现三个函数，跑 `test_losses.py` |
 | **计划版本** | 合并版（A 的内容 + B 的节奏），2026-09-15 切换 |
 
-**Day 2 的文件**（都在 `week01/day02_calculus/`）：
+**Day 3 的文件**（`week01/day03_losses/`）—— 待完成：
 
 | 文件 | 用途 |
 |---|---|
-| `grad_check.py` | 梯度验证器 —— 手推完填进去，用数值梯度对答案 |
-| `derivative_notes.md` | 手推模板 + 三条验收问题 |
+| `losses.py` | **要你填的**：`stable_softmax` / `cross_entropy` / `cross_entropy_grad` |
+| `test_losses.py` | 10 项测试（形状、和为1、数值稳定、手算、梯度检验）|
+| `notes.md` | 概念链条 + 6 道检验题 |
 
-**Day 1 的文件**（都在 `week01/day01_shapes/`，已归档）：
+**已完成的日子**：
 
-`numpy_semantics.md` · `numpy_demo.py` · `shape_quiz.py` · `shape_drills.py` · `tensor_shape_notes.md`
+- Day 1 · `week01/day01_shapes/` —— shape 语义、广播、31 题 + 速查表
+- Day 2 · `week01/day02_calculus/` —— 链式法则、计算图、梯度验证器
 
 ---
 
@@ -65,9 +67,13 @@ deep-learning-journey/
     │   ├── shape_quiz.py           31 题交互答题
     │   ├── shape_drills.py         31 题填 guess 版
     │   └── tensor_shape_notes.md   速查表 + 错题本
-    └── day02_calculus/         ← 进行中
-        ├── grad_check.py           梯度验证器
-        └── derivative_notes.md     手推模板
+    ├── day02_calculus/         ✅ 已完成
+    │   ├── grad_check.py           梯度验证器
+    │   └── derivative_notes.md     手推模板 + 验收答案
+    └── day03_losses/           ← 进行中
+        ├── losses.py               【要你填】softmax / CE / 梯度
+        ├── test_losses.py          10 项测试
+        └── notes.md                概念链条 + 检验题
 ```
 
 > 后续每周的新目录按 `STUDY-PLAN.md` 第五节的产出清单建（如 `01-linear-regression/`、`03-micrograd/`）。
@@ -101,8 +107,8 @@ deep-learning-journey/
       → `numpy_semantics.md`（NumPy 语义速览）
       → `numpy_demo.py`（配套可运行演示）
       → `tensor_shape_notes.md`（速查表）
-- [ ] **Day 2** 微积分：偏导 / 梯度 / 链式法则 → `derivative_notes.md`
-- [ ] **Day 3** 概率 / MLE / Entropy / Cross Entropy → `losses.py`
+- [x] **Day 2** 微积分：偏导 / 梯度 / 链式法则 ✅ → `derivative_notes.md`
+- [ ] **Day 3** 概率 / MLE / Entropy / Cross Entropy → `losses.py`  ← 进行中
 - [ ] **Day 4** Linear Regression from scratch → `01-linear-regression/` + loss curve
 - [ ] **Day 5** Logistic Regression → `logistic_regression_numpy.py`
 - [ ] **Day 6** Softmax Multiclass → `02-softmax-classifier/`
