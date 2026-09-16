@@ -113,11 +113,12 @@ def grad1(p):
     """
     w, b, x = p
 
-    # ↓↓↓ TODO: 把下面三行换成你推出来的式子 ↓↓↓
-    dw = 2(wx+b)*x
-    db = 2(wx+b)
-    dx = 2(wx+b)*w
-    # ↑↑↑ TODO ↑↑↑
+    # 你手推的结果： dw = 2(wx+b)·x   db = 2(wx+b)   dx = 2(wx+b)·w
+    # 换成 Python 写法（不能省乘号，变量名不能连写）：
+    u  = w * x + b
+    dw = 2 * u * x
+    db = 2 * u
+    dx = 2 * u * w
 
     return np.array([dw, db, dx])
 
@@ -161,13 +162,25 @@ def grad2(p):
     """
     w1, b1, w2, b2, x = p
 
-    # ↓↓↓ TODO: 把下面换成你推出来的式子 ↓↓↓
-    dz_dw1 = 0.0
-    dz_db1 = 0.0
-    dz_dw2 = 0.0
-    dz_db2 = 0.0
-    dz_dx = 0.0
-    # ↑↑↑ TODO ↑↑↑
+    # ---- forward：先把中间量算出来 ----
+    h = w1 * x + b1          # 一层的线性部分
+    a = relu(h)              # 一层的激活
+    u = w2 * a + b2          # 二层的线性部分
+    z = sigmoid(u)           # 二层的激活
+
+    # ---- backward：从 z 开始，一步步往前推 ----
+    # 每一步都是「局部导数 × 上游梯度」
+    dz_du = z * (1 - z)      # Sigmoid 的导数 σ'(u) = σ(u)·(1−σ(u))
+
+    dz_dw2 = dz_du * a       # u = w2·a + b2 -> 对 w2 的局部导数是 a
+    dz_db2 = dz_du * 1.0     #                   对 b2 的局部导数是 1
+
+    dz_da = dz_du * w2       #                   对 a  的局部导数是 w2
+    dz_dh = dz_da * (h > 0)  # ReLU 的导数：h>0 时是 1，否则 0
+
+    dz_dw1 = dz_dh * x       # h = w1·x + b1 -> 对 w1 的局部导数是 x
+    dz_db1 = dz_dh * 1.0     #                   对 b1 的局部导数是 1
+    dz_dx = dz_dh * w1       #                   对 x  的局部导数是 w1
 
     return np.array([dz_dw1, dz_db1, dz_dw2, dz_db2, dz_dx])
 
