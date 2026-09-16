@@ -95,15 +95,21 @@ def cross_entropy(logits, labels):
     logits = np.asarray(logits, dtype=float)
     labels = np.asarray(labels)
 
-    # ↓↓↓ TODO: 实现 ↓↓↓
+    # ---- 写法 A：先 softmax 再取 log（你写的，直译定义）----
+    #   probs = stable_softmax(logits)
+    #   correct_probs = probs[np.arange(len(labels)), labels]
+    #   return float(np.mean(-np.log(correct_probs)))
     #
-    # 步骤提示：
-    #   1. 算 logsumexp（用 max-shift 保持稳定）
-    #   2. 取出每个样本正确类别的 logit
-    #   3. loss = logsumexp − 正确类别的 logit，再取平均
+    #   数学上完全正确，普通情况结果和下面一样。
+    #   但极端情况会下溢：logits=[0,-1000] 时概率变成 0，log(0) = inf。
     #
-    raise NotImplementedError("还没实现 cross_entropy")
-    # ↑↑↑ TODO ↑↑↑
+    # ---- 写法 B：在 log 空间里直接算（标准做法）----
+    #   log(正确类别的概率) = logit[正确类别] − logsumexp(logits)
+    #   全程不经过"概率"，不会下溢。
+    m = logits.max(axis=-1, keepdims=True)          # max-shift
+    lse = np.log(np.exp(logits - m).sum(axis=-1)) + m.squeeze(-1)
+    correct_logit = logits[np.arange(len(labels)), labels]
+    return float((lse - correct_logit).mean())
 
 
 # =====================================================================
@@ -129,11 +135,14 @@ def cross_entropy_grad(logits, labels):
     labels = np.asarray(labels)
     N = logits.shape[0]
 
-    # ↓↓↓ TODO: 实现 ↓↓↓
+    # ↓↓↓ TODO: 实现梯度 ↓↓↓
+    #
+    # 目标：∂loss/∂logits = softmax(logits) − one_hot(labels)
     #
     # 步骤提示：
     #   1. probs = stable_softmax(logits)
     #   2. 在【正确类别】的位置上减 1
+    #      位置怎么取？和 ② 里取 correct_logit 是同一个写法
     #   3. 除以 N（因为 loss 是平均）
     #
     raise NotImplementedError("还没实现 cross_entropy_grad")
