@@ -47,21 +47,11 @@ import numpy as np
 #       (N, C) 的概率，每行的和必须是 1
 # =====================================================================
 def stable_softmax(logits, axis=-1):
-    logits=np.asarray(logits, dtype=float)
-    shifted=logits-np.max(logits,axis=axis,keepdims=True)
-    # ↓↓↓ TODO: 实现稳定版 softmax ↓↓↓
-    exp_values=np.exp(shifted)
-    probs=exp_values / np.sum(exp_values,axis=axis,keepdims=True)
+    logits = np.asarray(logits, dtype=float)
+    shifted = logits - np.max(logits, axis=axis, keepdims=True)   # max-shift
+    exp_values = np.exp(shifted)
+    probs = exp_values / np.sum(exp_values, axis=axis, keepdims=True)
     return probs
-
-
-    # 提示三步：
-    #   1. 减去最大值（要用 keepdims=True，想想为什么）
-    #   2. 取 exp
-    #   3. 除以和（同样要 keepdims=True）
-
-    raise NotImplementedError("还没实现 stable_softmax")
-    # ↑↑↑ TODO ↑↑↑
 
 
 # =====================================================================
@@ -92,24 +82,19 @@ def stable_softmax(logits, axis=-1):
 #   提示：用 np.arange(N) 配合 labels 取到"每个样本正确类别"的 logit
 # =====================================================================
 def cross_entropy(logits, labels):
+    # 在 log 空间里直接算（标准做法），全程不经过"概率"，不会下溢：
+    #     log(正确类别的概率) = logit[正确类别] − logsumexp(logits)
+    #
+    # 等价写法（先 softmax 再 log，直译定义）：
+    #     probs = stable_softmax(logits)
+    #     return float(np.mean(-np.log(probs[np.arange(len(labels)), labels])))
+    # 普通情况结果一样，但 logits=[0,-1000] 时概率下溢成 0，log(0) = inf。
     logits = np.asarray(logits, dtype=float)
     labels = np.asarray(labels)
-
-    # ---- 写法 A：先 softmax 再取 log（你写的，直译定义）----
-    #   probs = stable_softmax(logits)
-    #   correct_probs = probs[np.arange(len(labels)), labels]
-    #   return float(np.mean(-np.log(correct_probs)))
-    #
-    #   数学上完全正确，普通情况结果和下面一样。
-    #   但极端情况会下溢：logits=[0,-1000] 时概率变成 0，log(0) = inf。
-    #
-    # ---- 写法 B：在 log 空间里直接算（标准做法）----
-    #   log(正确类别的概率) = logit[正确类别] − logsumexp(logits)
-    #   全程不经过"概率"，不会下溢。
-    m = logits.max(axis=-1, keepdims=True)          # max-shift
+    m = logits.max(axis=-1, keepdims=True)                    # max-shift
     lse = np.log(np.exp(logits - m).sum(axis=-1)) + m.squeeze(-1)
-    correct_logit = logits[np.arange(len(labels)), labels]
-    return float((lse - correct_logit).mean())
+    corrects = logits[np.arange(len(labels)), labels]         # 正确类别的 logit
+    return float((lse - corrects).mean())
 
 
 # =====================================================================
@@ -131,22 +116,13 @@ def cross_entropy(logits, labels):
 #       (N, C) 的梯度
 # =====================================================================
 def cross_entropy_grad(logits, labels):
+    # ∂loss/∂logits = softmax(logits) − one_hot(labels)，再除以 N
     logits = np.asarray(logits, dtype=float)
     labels = np.asarray(labels)
     N = logits.shape[0]
-
-    # ↓↓↓ TODO: 实现梯度 ↓↓↓
-    #
-    # 目标：∂loss/∂logits = softmax(logits) − one_hot(labels)
-    #
-    # 步骤提示：
-    #   1. probs = stable_softmax(logits)
-    #   2. 在【正确类别】的位置上减 1
-    #      位置怎么取？和 ② 里取 correct_logit 是同一个写法
-    #   3. 除以 N（因为 loss 是平均）
-    #
-    raise NotImplementedError("还没实现 cross_entropy_grad")
-    # ↑↑↑ TODO ↑↑↑
+    probs = stable_softmax(logits)
+    probs[np.arange(N), labels] -= 1.0      # 正确类别位置减 1（= 减去 one_hot）
+    return probs / N                        # loss 是平均，所以梯度除以 N
 
 
 # =====================================================================
