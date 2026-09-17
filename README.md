@@ -15,11 +15,11 @@
 
 | | |
 |---|---|
-| **进行到** | Week 1 · **Day 3**（概率 / MLE / Cross Entropy）|
+| **进行到** | Week 1 · **Day 4**（Linear Regression from scratch）|
 | **Day 1** | ✅ 完成（09-15）· quiz 25/31 → 速查表 19/20 |
 | **Day 2** | ✅ 完成（09-16）· 验收 A 组 5/5，三组梯度测试通过 |
-| **Day 3** | 🟡 **代码完成**（09-17）· `losses.py` 三个函数，10/10 测试通过<br>⬜ 还差 `notes.md` 的 6 道检验题 |
-| **下次第一步** | 答 `notes.md` 的 6 道题；然后进 Day 4（线性回归 from scratch） |
+| **Day 3** | ✅ **完成**（09-17）· `losses.py` 三个函数 10/10 通过，5 道检验题已答 |
+| **下次第一步** | Day 4：Linear Regression from scratch → 第一次画 loss curve |
 | **计划版本** | 合并版（A 的内容 + B 的节奏），2026-09-15 切换 |
 
 **Day 3 的文件**（`week01/day03_losses/`）：
@@ -28,7 +28,7 @@
 |---|---|
 | `losses.py` | ✅ `stable_softmax` / `cross_entropy` / `cross_entropy_grad` |
 | `test_losses.py` | ✅ 10 项测试全过 |
-| `notes.md` | ⬜ 概念链条 + 6 道检验题（待答）|
+| `notes.md` | ✅ 概念链条 + 检验题（含答案与补充）|
 
 **已完成的日子**：
 
@@ -71,8 +71,8 @@ deep-learning-journey/
     ├── day02_calculus/         ✅ 已完成
     │   ├── grad_check.py           梯度验证器
     │   └── derivative_notes.md     手推模板 + 验收答案
-    └── day03_losses/           ← 进行中
-        ├── losses.py               【要你填】softmax / CE / 梯度
+    └── day03_losses/           ✅ 已完成
+        ├── losses.py               stable_softmax / cross_entropy / 梯度
         ├── test_losses.py          10 项测试
         └── notes.md                概念链条 + 检验题
 ```
@@ -109,8 +109,8 @@ deep-learning-journey/
       → `numpy_demo.py`（配套可运行演示）
       → `tensor_shape_notes.md`（速查表）
 - [x] **Day 2** 微积分：偏导 / 梯度 / 链式法则 ✅ → `derivative_notes.md`
-- [x] **Day 3** 概率 / MLE / Entropy / Cross Entropy ✅ 代码完成 → `losses.py`
-- [ ] **Day 4** Linear Regression from scratch → `01-linear-regression/` + loss curve
+- [x] **Day 3** 概率 / MLE / Entropy / Cross Entropy ✅ → `losses.py`
+- [ ] **Day 4** Linear Regression from scratch → `01-linear-regression/` + loss curve  ← 下一步
 - [ ] **Day 5** Logistic Regression → `logistic_regression_numpy.py`
 - [ ] **Day 6** Softmax Multiclass → `02-softmax-classifier/`
 - [ ] **Day 7** 复盘 + 小测 → `week01.md`
